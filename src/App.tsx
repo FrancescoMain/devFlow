@@ -1,11 +1,13 @@
 import "./App.css";
-import { TestComponent } from "./components/ui/TestComponent";
+import { Routes, Route } from "react-router-dom";
+import { NotFound } from "@/pages/NotFound";
 
 function App() {
   return (
-    <div>
-      <TestComponent />
-    </div>
+    <Routes>
+      <Route path="/" element={<div>Da Implementare</div>} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
