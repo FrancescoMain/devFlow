@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export function NotFound() {
+export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
       <h1 className="text-[8rem] font-bold leading-none tracking-tight text-primary">
