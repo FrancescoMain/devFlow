@@ -4,15 +4,23 @@
 
 @theme {
   --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
   --color-secondary: #10b981;
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-surface: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-muted: #64748b;
   --font-heading: "Inter", sans-serif;
   --spacing-lg: 2rem;
-  --color-background: #ffffff;
-  --color-foreground: #000000;
 }
 
-/* Override per dark mode */
 .dark {
   --color-background: #0a0a0a;
-  --color-foreground: #ffffff;
+  --color-foreground: #f1f5f9;
+  --color-surface: #111827;
+  --color-surface-hover: #1e293b;
+  --color-border: #1e293b;
+  --color-muted: #94a3b8;
 }
