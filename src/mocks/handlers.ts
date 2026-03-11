@@ -5,7 +5,7 @@ export const handlers = [
   http.post("/api/login", async ({ request }) => {
     const body = (await request.json()) as { email: string; password: string };
 
-    if (body.email === "test@test.com" && body.password === "passwod") {
+    if (body.email === "test@test.com" && body.password === "password") {
       return HttpResponse.json<LoginResponse>({
         token: "mock-jwt-token",
         user: { name: "Francesco", surname: "Cesarano", gender: "M" },

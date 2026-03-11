@@ -6,9 +6,9 @@ import { createContext, useReducer } from "react";
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
     case "LOGIN":
-      return { user: action.payload, isAuthenticated: true, loading: false };
+      return { user: action.payload.user, token: action.payload.token, isAuthenticated: true, loading: false };
     case "LOGOUT":
-      return { user: null, isAuthenticated: false, loading: false };
+      return { user: null, token: null, isAuthenticated: false, loading: false };
     case "SET_LOADING":
       return { ...state, loading: action.payload };
     default: {
@@ -27,6 +27,7 @@ export const AuthDispatchContext = createContext<
 //Initial State
 const initialState: AuthState = {
   user: null,
+  token: null,
   isAuthenticated: false,
   loading: false,
 };
