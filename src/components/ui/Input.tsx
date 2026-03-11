@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
@@ -23,15 +23,31 @@ const inputVariants = cva(
   },
 );
 
+export interface InputHandle {
+  focus: () => void;
+  clear: () => void;
+  getValue: () => string;
+}
+
 interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
     VariantProps<typeof inputVariants> {}
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
+const Input = forwardRef<InputHandle, InputProps>(
   ({ className, size, state, ...props }, ref) => {
+    const innerRef = useRef<HTMLInputElement>(null);
+
+    useImperativeHandle(ref, () => ({
+      focus: () => innerRef.current?.focus(),
+      clear: () => {
+        if (innerRef.current) innerRef.current.value = "";
+      },
+      getValue: () => innerRef.current?.value ?? "",
+    }));
+
     return (
       <input
-        ref={ref}
+        ref={innerRef}
         className={cn(inputVariants({ size, state }), className)}
         {...props}
       />

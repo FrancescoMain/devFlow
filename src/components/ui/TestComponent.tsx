@@ -1,6 +1,6 @@
 export interface IAppProps {}
 
-export function TestComponent(props: IAppProps) {
+export function TestComponent(_props: IAppProps) {
   function handleClickToggle() {
     document.documentElement.classList.toggle("dark");
   }

@@ -3,7 +3,7 @@ import type { AuthState } from "@/types/Auth/AuthState";
 import { createContext, useReducer } from "react";
 
 //Reducer
-function authReducer(state: AuthState, action: AuthAction) {
+function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
     case "LOGIN":
       return { user: action.payload, isAuthenticated: true, loading: false };
@@ -11,6 +11,10 @@ function authReducer(state: AuthState, action: AuthAction) {
       return { user: null, isAuthenticated: false, loading: false };
     case "SET_LOADING":
       return { ...state, loading: action.payload };
+    default: {
+      const _exhaustive: never = action;
+      return _exhaustive;
+    }
   }
 }
 
