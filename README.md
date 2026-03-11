@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# devFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dashboard frontend built with React 19, TypeScript, Vite and Tailwind CSS v4.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# Install dependencies
+npm install
 
-## React Compiler
+# Initialize MSW service worker
+npx msw init public/ --save
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Start dev server on localhost:3000
+npm run dev
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```
+src/
+├── components/
+│   ├── layout/          # Layout system (compound components)
+│   │   ├── Layout.tsx   # Root layout with context provider
+│   │   ├── Header.tsx   # Sticky header with dark mode toggle
+│   │   ├── Sidebar.tsx  # Collapsible sidebar navigation
+│   │   ├── Content.tsx  # Main content area
+│   │   ├── Footer.tsx   # Footer bar
+│   │   └── DefaultLayout.tsx  # Pre-composed layout with toggle props
+│   └── ui/              # Base UI components (Button, Input, Badge)
+├── features/
+│   └── auth/            # Auth context with split state/dispatch
+├── hooks/
+│   ├── Auth/            # useAuthState, useAuthDispatch
+│   └── Layout/          # useLayout
+├── lib/                 # Utilities (cn, fetchApi, useContextSafe)
+├── mocks/               # MSW handlers and browser setup
+├── pages/               # Route pages (Login, NotFound)
+└── types/               # Shared TypeScript types
+    ├── Api/             # API response types (LoginResponse, ErrorResponse)
+    ├── Auth/            # Auth types (User, AuthState, AuthAction)
+    └── Layout/          # Layout types (LayoutContextType)
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Key patterns
+
+### Auth context split
+`AuthStateContext` and `AuthDispatchContext` are separate contexts. Components that only dispatch actions (e.g. logout button) never re-render on state changes.
+
+### Discriminated union actions
+`AuthAction` is a union type with exhaustive switch — adding a new action without handling it causes a compile error.
+
+### Compound components
+`Layout` exposes `Layout.Header`, `Layout.Sidebar`, `Layout.Content`, `Layout.Footer` as sub-components sharing state via context. `DefaultLayout` provides a pre-composed version with `showHeader`, `showSidebar`, `showFooter` toggle props.
+
+### CVA + forwardRef
+UI components use `class-variance-authority` for variant management and `forwardRef` for ref forwarding. `Input` uses `useImperativeHandle` to expose a typed `InputHandle` API (focus, clear, getValue).
+
+### Mock API (MSW v2)
+Mock handlers in `src/mocks/` intercept fetch requests in development. In production, MSW is never loaded — the same fetch calls hit the real API. Response types in `src/types/Api/` are shared between mocks and frontend.
+
+### Token in memory
+Auth token lives in React state (not localStorage). It is lost on page refresh by design.
+
+### Route-based code splitting
+Every page is lazy-loaded with `React.lazy()` + `Suspense`, producing separate JS chunks visible in the Network tab.
+
+### Generic API client
+`fetchApi<T>(url, options)` provides typed fetch with centralized error handling.
+
+## Tech stack
+
+- React 19 + TypeScript 5.9 (strict mode)
+- Vite 7 + vite-tsconfig-paths
+- Tailwind CSS v4 (with `@custom-variant dark` class strategy)
+- React Router v6 (with lazy routes and protected routes)
+- MSW v2 (mock API)
+- CVA + clsx + tailwind-merge (component variants)
+
+## Mock credentials
+
+```
+Email: test@test.com
+Password: password
 ```
