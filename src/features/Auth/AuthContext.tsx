@@ -2,10 +2,6 @@ import type { AuthAction } from "@/types/Auth/AuthAction";
 import type { AuthState } from "@/types/Auth/AuthState";
 import { createContext, useReducer } from "react";
 
-interface AuthContextForProvider extends AuthState {
-  dispatch: React.Dispatch<AuthAction>;
-}
-
 //Reducer
 function authReducer(state: AuthState, action: AuthAction) {
   switch (action.type) {
@@ -17,10 +13,12 @@ function authReducer(state: AuthState, action: AuthAction) {
       return { ...state, loading: action.payload };
   }
 }
-//Context
-export const AuthContext = createContext<AuthContextForProvider | undefined>(
-  undefined,
-);
+
+//Contexts
+export const AuthStateContext = createContext<AuthState | undefined>(undefined);
+export const AuthDispatchContext = createContext<
+  React.Dispatch<AuthAction> | undefined
+>(undefined);
 
 //Initial State
 const initialState: AuthState = {
@@ -33,8 +31,10 @@ const initialState: AuthState = {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
   return (
-    <AuthContext.Provider value={{ ...state, dispatch }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthStateContext.Provider value={state}>
+      <AuthDispatchContext.Provider value={dispatch}>
+        {children}
+      </AuthDispatchContext.Provider>
+    </AuthStateContext.Provider>
   );
 }
