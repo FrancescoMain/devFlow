@@ -1,37 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthDispatch } from "@/hooks/Auth/useAuth";
-import { fetchApi } from "@/lib/fetchApi";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import type { LoginResponse } from "@/types/Api/LoginResponse";
+import { useLogin } from "@/hooks/Auth/useLogin";
 
 export default function Login() {
-  const dispatch = useAuthDispatch();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { mutate, isPending, isError } = useLogin();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const data = await fetchApi<LoginResponse>("/api/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-
-      dispatch({ type: "LOGIN", payload: { user: data.user, token: data.token } });
-      navigate("/");
-    } catch {
-      setError("Credenziali non valide");
-    } finally {
-      setLoading(false);
-    }
+    mutate({ email, password });
   };
 
   return (
@@ -45,9 +24,9 @@ export default function Login() {
         </h1>
         <p className="text-sm text-muted">Accedi al tuo account</p>
 
-        {error && (
+        {isError && (
           <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">
-            {error}
+            Credenziali non valide
           </p>
         )}
 
@@ -57,7 +36,7 @@ export default function Login() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          state={error ? "error" : "default"}
+          state={isError ? "error" : "default"}
         />
         <Input
           type="password"
@@ -65,16 +44,14 @@ export default function Login() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          state={error ? "error" : "default"}
+          state={isError ? "error" : "default"}
         />
 
-        <Button type="submit" disabled={loading}>
-          {loading ? "Accesso..." : "Accedi"}
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Accesso..." : "Accedi"}
         </Button>
 
-        <p className="text-xs text-muted">
-          Test: test@test.com / password
-        </p>
+        <p className="text-xs text-muted">Test: test@test.com / password</p>
       </form>
     </div>
   );
