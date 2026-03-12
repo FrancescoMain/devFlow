@@ -5,9 +5,13 @@ import { createContext, useReducer } from "react";
 //Reducer
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
-    case "LOGIN":
-      return { user: action.payload.user, token: action.payload.token, isAuthenticated: true, loading: false };
+    case "LOGIN": {
+      const next = { user: action.payload.user, token: action.payload.token, isAuthenticated: true, loading: false };
+      sessionStorage.setItem("auth", JSON.stringify(next));
+      return next;
+    }
     case "LOGOUT":
+      sessionStorage.removeItem("auth");
       return { user: null, token: null, isAuthenticated: false, loading: false };
     case "SET_LOADING":
       return { ...state, loading: action.payload };
@@ -25,16 +29,17 @@ export const AuthDispatchContext = createContext<
 >(undefined);
 
 //Initial State
-const initialState: AuthState = {
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  loading: false,
-};
+function getInitialState(): AuthState {
+  const stored = sessionStorage.getItem("auth");
+  if (stored) {
+    return JSON.parse(stored) as AuthState;
+  }
+  return { user: null, token: null, isAuthenticated: false, loading: false };
+}
 
 //Provider
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [state, dispatch] = useReducer(authReducer, null, getInitialState);
   return (
     <AuthStateContext.Provider value={state}>
       <AuthDispatchContext.Provider value={dispatch}>

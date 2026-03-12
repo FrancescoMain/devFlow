@@ -34,8 +34,24 @@ export const handlers = [
   }),
 
   //TASK
-  http.get("/api/tasks", async () => {
-    return HttpResponse.json<Task[]>(tasks);
+  http.get("/api/tasks", async ({ request }) => {
+    const url = new URL(request.url);
+    const search = url.searchParams.get("search") ?? "";
+    const status = url.searchParams.get("status") ?? "";
+    let filtered = tasks;
+
+    if (search) {
+      filtered = filtered.filter((t) =>
+        t.title.toLowerCase().includes(search.toLowerCase()),
+      );
+    }
+
+    if (status === "completed") {
+      filtered = filtered.filter((t) => t.completed);
+    } else if (status === "pending") {
+      filtered = filtered.filter((t) => !t.completed);
+    }
+    return HttpResponse.json<Task[]>(filtered);
   }),
   http.post("/api/tasks", async ({ request }) => {
     const body = (await request.json()) as { title: string };

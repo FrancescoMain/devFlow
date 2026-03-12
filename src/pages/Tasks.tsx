@@ -6,12 +6,15 @@ import { useTasks } from "@/hooks/Task/useTasks";
 import { useAddTask } from "@/hooks/Task/useAddTask";
 import { useToggleTask } from "@/hooks/Task/useToggleTask";
 import { useDeleteTask } from "@/hooks/Task/useDeleteTask";
+import { useTaskFilters } from "@/hooks/Task/useTaskFilter";
 
 export default function Tasks() {
   const [title, setTitle] = useState("");
 
+  const { filters, debouncedFilters, setFilters } = useTaskFilters();
+
   const addTask = useAddTask().mutate;
-  const { data: tasks = [], isLoading, isError } = useTasks();
+  const { data: tasks = [], isLoading, isError } = useTasks(debouncedFilters);
   const toggleTask = useToggleTask().mutate;
   const deleteTask = useDeleteTask().mutate;
 
@@ -29,6 +32,27 @@ export default function Tasks() {
         <Badge variant="muted" size="sm">
           {tasks.filter((t) => t.completed).length}/{tasks.length}
         </Badge>
+      </div>
+
+      {/* Search */}
+      <Input
+        placeholder="Cerca task..."
+        value={filters.search}
+        onChange={(e) => setFilters({ search: e.target.value })}
+      />
+
+      {/* Status filter */}
+      <div className="flex gap-2">
+        {(["all", "pending", "completed"] as const).map((s) => (
+          <Button
+            key={s}
+            variant={filters.status === s ? "primary" : "secondary"}
+            size="sm"
+            onClick={() => setFilters({ status: s })}
+          >
+            {s === "all" ? "Tutti" : s === "pending" ? "Da fare" : "Completati"}
+          </Button>
+        ))}
       </div>
 
       <form onSubmit={handleAdd} className="flex gap-2">
