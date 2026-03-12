@@ -6,6 +6,7 @@ import { DefaultLayout } from "./components/layout/DefaultLayout";
 import { useAuthState } from "@/hooks/Auth/useAuth";
 
 const Login = lazy(() => import("@/pages/Login"));
+const Tasks = lazy(() => import("@/pages/Tasks"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -23,6 +24,16 @@ function App() {
           element={
             <ProtectedRoute>
               <DefaultLayout>Home</DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <DefaultLayout>
+                <Tasks />
+              </DefaultLayout>
             </ProtectedRoute>
           }
         />

@@ -1,20 +1,13 @@
 import { userKeys } from "@/lib/queryKeys";
-import { useAuthState } from "./useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "@/lib/fetchApi";
 import { type LoginResponse } from "@/types/Api/LoginResponse";
+import { useAuthFetch } from "./useAuthFetch";
 
 export const useMe = () => {
-  const { token } = useAuthState();
+  const { authFetch, isAuthenticated } = useAuthFetch();
   return useQuery({
     queryKey: userKeys.me(),
-    queryFn: () => {
-      return fetchApi<LoginResponse>("/api/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
-    enabled: !!token,
+    queryFn: () => authFetch<LoginResponse>("/api/me"),
+    enabled: isAuthenticated,
   });
 };
