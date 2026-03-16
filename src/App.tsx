@@ -7,6 +7,7 @@ import { useAuthState } from "@/hooks/Auth/useAuth";
 
 const Login = lazy(() => import("@/pages/Login"));
 const Tasks = lazy(() => import("@/pages/Tasks"));
+const Projects = lazy(() => import("@/pages/Projects"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -33,6 +34,16 @@ function App() {
             <ProtectedRoute>
               <DefaultLayout>
                 <Tasks />
+              </DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <DefaultLayout>
+                <Projects />
               </DefaultLayout>
             </ProtectedRoute>
           }
